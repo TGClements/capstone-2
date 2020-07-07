@@ -27,7 +27,6 @@ public class NumberGrid extends UserInterface {
 
         try {
             String userVal = "0";
-            System.out.println("User entered: " + userVal);
 
             while (Integer.parseInt(userVal) != 1 || Integer.parseInt(userVal) != 2 || Integer.parseInt(userVal) != 3
                     || Integer.parseInt(userVal) != 4 || Integer.parseInt(userVal) != 5

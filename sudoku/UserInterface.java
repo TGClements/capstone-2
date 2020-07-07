@@ -40,6 +40,7 @@ public class UserInterface {
         f.setLayout(new BorderLayout());
         f.setVisible(true);
         f.setResizable(false);
+        f.setLocationRelativeTo(null);
     }
 
     private void createMainMenu() {

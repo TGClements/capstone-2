@@ -1,7 +1,5 @@
 package sudoku;
 
-import java.util.*;
-
 public class Game {
 
     int masterGrid[][];
@@ -14,7 +12,7 @@ public class Game {
         System.out.println("Generating master grid.");
         generateMasterGrid();
 
-        //displayMasterGrid();
+        displayMasterGrid();
     }
 
     private void generateMasterGrid() {
@@ -33,20 +31,53 @@ public class Game {
             }
         }
 
-        shiftLeft(1, 3);
-        shiftLeft(2, 3);
+        // Lambda for left shift
+        lambdaShiftLeft lsl = (rowNum, shiftVal) -> {
 
-        shiftLeft(3, 1);
-        shiftLeft(4, 3);
-        shiftLeft(5, 3);
+            int i = 0;
 
-        shiftLeft(6, 1);
-        shiftLeft(7, 3);
-        shiftLeft(8, 3);
+            for (int j = shiftVal; j < 9; j++) {
 
-        displayMasterGrid();
+                masterGrid[rowNum][i] = masterGrid[rowNum - 1][j];
+
+                i++;
+            }
+
+            int k = 0;
+            for (int j = (9 - shiftVal); j < 9; j++) {
+
+                masterGrid[rowNum][i] = masterGrid[rowNum - 1][k];
+
+                i++;
+                k++;
+            }
+
+            return 0;
+        };
+
+        // Perform shifts to generate a valid puzzle
+        lsl.shiftLeft(1, 3);
+        lsl.shiftLeft(2, 3);
+
+        lsl.shiftLeft(3, 1);
+        lsl.shiftLeft(4, 3);
+        lsl.shiftLeft(5, 3);
+
+        lsl.shiftLeft(6, 1);
+        lsl.shiftLeft(7, 3);
+        lsl.shiftLeft(8, 3);
     }
 
+    // Interface for Lambda
+    static interface lambdaShiftLeft {
+        public int shiftLeft(int rowNum, int shiftVal);
+    }
+
+    static int shiftLeft(int rowNum, int shiftVal, lambdaShiftLeft lsl) {
+        return lsl.shiftLeft(rowNum, shiftVal);
+    }
+
+    // Generate a valid first column to then shift
     private boolean isValidForCol(int newValue) {
 
         for (int j = 0; j < 9; j++) {
@@ -60,29 +91,7 @@ public class Game {
         return true;
     }
 
-    // maybe convert this to lambda
-    private void shiftLeft(int rowNum, int shiftVal) {
-
-        int i = 0;
-
-        for (int j = shiftVal; j < 9; j++) {
-
-            masterGrid[rowNum][i] = masterGrid[rowNum - 1][j];
-
-            i++;
-        }
-
-        int k = 0;
-        for (int j = (9 - shiftVal); j < 9; j++) {
-
-            masterGrid[rowNum][i] = masterGrid[rowNum - 1][k];
-
-            i++;
-            k++;
-        }
-
-    }
-
+    // Print out the grid
     private void displayMasterGrid() {
 
         for (int i = 0; i < 9; i++) {
@@ -97,6 +106,7 @@ public class Game {
         System.out.println("\n");
     }
 
+    // Return the int value of a grid location
     public int getGridValue(int x, int y) {
 
         return masterGrid[y][x];
