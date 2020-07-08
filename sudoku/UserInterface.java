@@ -12,9 +12,13 @@ public class UserInterface {
     private JMenu mainMenu, currentGame, options, helpMenu;
     private JMenuItem newEGame, newMGame, newHGame, newXGame, instructions, quit, lockInCorrect, checkWin;
 
-    NumberGrid ng;
+    //private JMenuItem timeElapsed;
+    public static JMenuItem timeElapsed;
 
+    NumberGrid ng;
     Game g;
+
+    ThreadedTimer tt;
 
     public UserInterface() {
         f = new JFrame("Sudoku");
@@ -41,6 +45,13 @@ public class UserInterface {
         f.setVisible(true);
         f.setResizable(false);
         f.setLocationRelativeTo(null);
+
+        tt = new ThreadedTimer();
+        tt.setName("Sudoku-Timer");
+    }
+
+    public static void setTimeElapsed(String time) {
+        timeElapsed.setText(time);
     }
 
     private void createMainMenu() {
@@ -113,10 +124,14 @@ public class UserInterface {
         checkWin.addActionListener(e -> {
             checkGameWin();
         });
+        timeElapsed = new JMenuItem("Elapsed Time: ");
+        timeElapsed.setEnabled(false);
 
         // Add the items to the menu
         currentGame.add(lockInCorrect);
         currentGame.add(checkWin);
+        currentGame.addSeparator();
+        currentGame.add(timeElapsed);
         currentGame.setEnabled(false);
     }
 
@@ -172,15 +187,29 @@ public class UserInterface {
         }
     }
 
+    // Start new easy game
     private void startNewEGame() {
+        // tt.stop();
+        // tt.reset();
+
         resetButtonState();
 
         g = new Game();
         populateButtonGrid(45);
 
         currentGame.setEnabled(true);
+
+        // If the thread has died, create a new one, otherwise, reset the current thread
+        if (!tt.isAlive()) {
+            tt = new ThreadedTimer();
+            tt.setName("Sudoku-Timer");
+            tt.start();
+        } else {
+            tt.reset();
+        }
     }
 
+    // Start new medium game
     private void startNewMGame() {
         resetButtonState();
 
@@ -188,8 +217,18 @@ public class UserInterface {
         populateButtonGrid(35);
 
         currentGame.setEnabled(true);
+
+        // If the thread has died, create a new one, otherwise, reset the current thread
+        if (!tt.isAlive()) {
+            tt = new ThreadedTimer();
+            tt.setName("Sudoku-Timer");
+            tt.start();
+        } else {
+            tt.reset();
+        }
     }
 
+    // Start new hard game
     private void startNewHGame() {
         resetButtonState();
 
@@ -197,8 +236,18 @@ public class UserInterface {
         populateButtonGrid(25);
 
         currentGame.setEnabled(true);
+
+        // If the thread has died, create a new one, otherwise, reset the current thread
+        if (!tt.isAlive()) {
+            tt = new ThreadedTimer();
+            tt.setName("Sudoku-Timer");
+            tt.start();
+        } else {
+            tt.reset();
+        }
     }
 
+    // Start new expert game
     private void startNewXGame() {
         resetButtonState();
 
@@ -206,11 +255,20 @@ public class UserInterface {
         populateButtonGrid(15);
 
         currentGame.setEnabled(true);
+
+        // If the thread has died, create a new one, otherwise, reset the current thread
+        if (!tt.isAlive()) {
+            tt = new ThreadedTimer();
+            tt.setName("Sudoku-Timer");
+            tt.start();
+        } else {
+            tt.reset();
+        }
     }
 
     private void populateButtonGrid(int numToShow) {
 
-        // Pick 25 random spots to show in the grid
+        // Pick random spots to show in the grid. Less are shown for the higher difficulties.
         int visibleButtons[] = new int[numToShow];
 
         for (int i = 0; i < visibleButtons.length; i++) {
@@ -261,6 +319,7 @@ public class UserInterface {
 
     private void quit() {
         f.dispose();
+        // tt.stop();
     }
 
     private void displayInstructions() {
@@ -319,6 +378,7 @@ public class UserInterface {
         }
 
         if (numMatches == 81) {
+            tt.tStop();
             System.out.println("You win!");
             lockInCorrectAnswers();
             JOptionPane.showMessageDialog(f, "You Win!!", "Winner", JOptionPane.INFORMATION_MESSAGE);
@@ -327,5 +387,69 @@ public class UserInterface {
             JOptionPane.showMessageDialog(f, "Not a winner yet...", "Keep going!", JOptionPane.ERROR_MESSAGE);
         }
     }
+}
 
+// Creating the abstract class here to fulfill the core requirement. I wanted to not use an 
+// abstract class here and just extend UserInterface from ThreadedTimer. But I really saw
+// no other better place for me to try to use an abstract class.
+abstract class Timer extends Thread {
+
+    public void reset() {
+    }
+
+    private void updateLabel() {
+    }
+}
+
+// Had to put the threads in this class file because I was not able to access data on the GUI
+// if it was in a different file. I tried for hours to get around this and found no success.
+// I don't want to do it this way, but it was the only thing that worked. I'm open to suggestions
+// on how to do this better.
+class ThreadedTimer extends Timer {
+
+    private int timeElapsedSec;
+    private boolean alive = true;
+
+    public ThreadedTimer() {
+
+        timeElapsedSec = 0;
+    }
+
+    @Override
+    public void run() {
+
+        System.out.println("thread started.");
+
+        while (alive) {
+            try {
+                Thread.sleep(1000);
+                timeElapsedSec++;
+                // System.out.println("Elapsed Time: " + timeElapsedSec + "s");
+                updateLabel();
+            } catch (InterruptedException ie) {
+                System.out.println("Thread was interrupted: " + ie);
+            }
+        }
+
+    }
+
+    public void reset() {
+        timeElapsedSec = 0;
+    }
+
+    public void tStop() {
+        alive = false;
+    }
+
+    private void updateLabel() {
+
+        UserInterface.setTimeElapsed("Elapsed Time: " + timeElapsedSec + "s");
+        try {
+
+            //timeritem.setText("Elapsed Time: " + timeElapsedSec + "s");
+        } catch (NullPointerException npe) {
+            System.out.println("some problem here: " + npe);
+        }
+
+    }
 }
