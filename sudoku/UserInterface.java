@@ -12,8 +12,8 @@ public class UserInterface {
     JFrame f;
     private JMenuBar menuBar;
     private JMenu mainMenu, currentGame, optionsMenu, helpMenu;
-    private JMenuItem newEGame, newMGame, newHGame, newXGame, instructions, quit, lockInCorrect, checkWin, bestTimes,
-            lightMode, darkMode;
+    private JMenuItem newEGame, newMGame, newHGame, newXGame, instructions, about, quit, lockInCorrect, checkWin,
+            bestTimes, lightMode, darkMode;
     private boolean darkmode;
 
     public static JMenuItem timeElapsed;
@@ -195,9 +195,15 @@ public class UserInterface {
         instructions.addActionListener(e -> {
             displayInstructions();
         });
+        about = new JMenuItem("About");
+        about.setMnemonic(KeyEvent.VK_A);
+        about.addActionListener(e -> {
+            displayAbout();
+        });
 
         // Add items to menu
         helpMenu.add(instructions);
+        helpMenu.add(about);
     }
 
     private void renderButtonGrid() {
@@ -495,6 +501,25 @@ public class UserInterface {
         JOptionPane.showMessageDialog(f, gameInstructions, "Instructions", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    private void displayAbout() {
+        // Do some darkmode checking
+        if (darkmode) {
+            UIManager.put("OptionPane.background", Color.BLACK);
+            UIManager.put("Panel.background", Color.BLACK);
+            UIManager.put("OptionPane.messageForeground", Color.WHITE);
+            UIManager.put("Button.background", Color.WHITE);
+        } else {
+            UIManager.put("OptionPane.background", Color.WHITE);
+            UIManager.put("Panel.background", Color.WHITE);
+            UIManager.put("OptionPane.messageForeground", Color.BLACK);
+            UIManager.put("Button.background", Color.LIGHT_GRAY);
+        }
+
+        JOptionPane.showMessageDialog(f,
+                "Author:\nTyler Clements\n\nCreated:\nJuly 2020\n\nGithub:\nhttps://github.com/TGClements/capstone-2",
+                "About", JOptionPane.INFORMATION_MESSAGE);
+    }
+
     // Reset all buttons to be enabled again
     private void resetButtonState() {
 
@@ -514,7 +539,7 @@ public class UserInterface {
 
                 // Check the buttons against the master grid
                 if (ng.getButtonVal(j, i) == g.getGridValue(j, i)) {
-                    System.out.println("Value matches for " + i + "," + j + "!");
+                    //System.out.println("Value matches for " + i + "," + j + "!");
                     ng.setButtonDisabled(j, i);
                 } else {
                     System.out.println("Value does not match for " + i + "," + j + "!");
