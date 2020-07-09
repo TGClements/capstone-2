@@ -10,7 +10,7 @@ public class UserInterface {
     JFrame f;
     private JMenuBar menuBar;
     private JMenu mainMenu, currentGame, options, helpMenu;
-    private JMenuItem newEGame, newMGame, newHGame, newXGame, instructions, quit, lockInCorrect, checkWin;
+    private JMenuItem newEGame, newMGame, newHGame, newXGame, instructions, quit, lockInCorrect, checkWin, bestTimes;
 
     //private JMenuItem timeElapsed;
     public static JMenuItem timeElapsed;
@@ -18,11 +18,13 @@ public class UserInterface {
     NumberGrid ng;
     Game g;
 
+    BestTimes bt;
+
     ThreadedTimer tt;
 
     public UserInterface() {
-        f = new JFrame("Sudoku");
 
+        f = new JFrame("Sudoku");
     }
 
     public void initUI() {
@@ -48,6 +50,8 @@ public class UserInterface {
 
         tt = new ThreadedTimer();
         tt.setName("Sudoku-Timer");
+
+        bt = new BestTimes();
     }
 
     public static void setTimeElapsed(String time) {
@@ -91,6 +95,12 @@ public class UserInterface {
             startNewXGame();
         });
 
+        bestTimes = new JMenuItem("Best Times");
+        bestTimes.setMnemonic(KeyEvent.VK_B);
+        bestTimes.addActionListener(e -> {
+            showBestTimes();
+        });
+
         quit = new JMenuItem("Quit");
         quit.setMnemonic(KeyEvent.VK_Q);
         quit.addActionListener(e -> {
@@ -102,6 +112,8 @@ public class UserInterface {
         mainMenu.add(newMGame);
         mainMenu.add(newHGame);
         mainMenu.add(newXGame);
+        mainMenu.addSeparator();
+        mainMenu.add(bestTimes);
         mainMenu.addSeparator();
         mainMenu.add(quit);
     }
@@ -189,9 +201,6 @@ public class UserInterface {
 
     // Start new easy game
     private void startNewEGame() {
-        // tt.stop();
-        // tt.reset();
-
         resetButtonState();
 
         g = new Game();
@@ -317,11 +326,21 @@ public class UserInterface {
         }
     }
 
-    private void quit() {
-        f.dispose();
-        // tt.stop();
+    // Show the popup displaying the 5 best completion times
+    private void showBestTimes() {
+
+        JOptionPane.showMessageDialog(f, bt.getFormattedTimeList(), "Best Times", JOptionPane.INFORMATION_MESSAGE);
+
+        System.out.println("displaying best times.");
     }
 
+    // Quit the game
+    private void quit() {
+        f.dispose();
+        tt.tStop();
+    }
+
+    // Show the popup displaying the instructions
     private void displayInstructions() {
 
         final String gameInstructions = "Sudoku rules for beginners:\n- Only use the numbers 1 to 9\n- Avoid trying to guess the solution to the puzzle\n- Only use each number once in each row, column, & grid\n- Use the process of elimination as a tactic";
@@ -341,6 +360,7 @@ public class UserInterface {
         }
     }
 
+    // Lock in correct answers for user to check answers before checking for win
     private void lockInCorrectAnswers() {
 
         // Iterate through the grid to check the values
@@ -359,6 +379,7 @@ public class UserInterface {
 
     }
 
+    // Check if the user solved the puzzle
     private void checkGameWin() {
 
         int numMatches = 0;
@@ -377,10 +398,15 @@ public class UserInterface {
             }
         }
 
+        // If there are 81 matches (9x9), every cell matches, therefore the user entered in 
+        // all correct values and is a winner.
         if (numMatches == 81) {
             tt.tStop();
             System.out.println("You win!");
             lockInCorrectAnswers();
+            if (bt.canAddToList(tt.getTime())) {
+                bt.addToList(tt.getTime());
+            }
             JOptionPane.showMessageDialog(f, "You Win!!", "Winner", JOptionPane.INFORMATION_MESSAGE);
         } else {
             System.out.println("Not a winner yet...");
@@ -390,7 +416,7 @@ public class UserInterface {
 }
 
 // Creating the abstract class here to fulfill the core requirement. I wanted to not use an 
-// abstract class here and just extend UserInterface from ThreadedTimer. But I really saw
+// abstract class here and just extend Thread from ThreadedTimer. But I really saw
 // no other better place for me to try to use an abstract class.
 abstract class Timer extends Thread {
 
@@ -441,15 +467,13 @@ class ThreadedTimer extends Timer {
         alive = false;
     }
 
+    public int getTime() {
+        return timeElapsedSec;
+    }
+
     private void updateLabel() {
 
+        // This is the part that prevented me from putting the timers in a separate class file
         UserInterface.setTimeElapsed("Elapsed Time: " + timeElapsedSec + "s");
-        try {
-
-            //timeritem.setText("Elapsed Time: " + timeElapsedSec + "s");
-        } catch (NullPointerException npe) {
-            System.out.println("some problem here: " + npe);
-        }
-
     }
 }
