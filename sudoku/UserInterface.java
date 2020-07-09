@@ -1,6 +1,8 @@
 package sudoku;
 
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalButtonUI;
+
 import java.awt.event.*;
 import java.awt.*;
 import java.util.*;
@@ -9,10 +11,11 @@ public class UserInterface {
 
     JFrame f;
     private JMenuBar menuBar;
-    private JMenu mainMenu, currentGame, options, helpMenu;
-    private JMenuItem newEGame, newMGame, newHGame, newXGame, instructions, quit, lockInCorrect, checkWin, bestTimes;
+    private JMenu mainMenu, currentGame, optionsMenu, helpMenu;
+    private JMenuItem newEGame, newMGame, newHGame, newXGame, instructions, quit, lockInCorrect, checkWin, bestTimes,
+            lightMode, darkMode;
+    private boolean darkmode;
 
-    //private JMenuItem timeElapsed;
     public static JMenuItem timeElapsed;
 
     NumberGrid ng;
@@ -31,9 +34,10 @@ public class UserInterface {
         // Create the menu bar
         menuBar = new JMenuBar();
 
-        // Create the main menu
+        // Create the menus
         createMainMenu();
         createCurrentGameMenu();
+        createOptionsMenu();
         createHelpMenu();
 
         // Set the menu bar to the frame
@@ -41,19 +45,24 @@ public class UserInterface {
 
         renderButtonGrid();
 
+        // Set frame options
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setSize(515, 560);
         f.setLayout(new BorderLayout());
         f.setVisible(true);
         f.setResizable(false);
         f.setLocationRelativeTo(null);
+        f.getContentPane().setBackground(Color.WHITE);
 
         tt = new ThreadedTimer();
         tt.setName("Sudoku-Timer");
 
         bt = new BestTimes();
+
+        setLightMode();
     }
 
+    // Set the text for the "Time Elapsed" menu item
     public static void setTimeElapsed(String time) {
         timeElapsed.setText(time);
     }
@@ -145,6 +154,32 @@ public class UserInterface {
         currentGame.addSeparator();
         currentGame.add(timeElapsed);
         currentGame.setEnabled(false);
+    }
+
+    private void createOptionsMenu() {
+
+        // Build the options menu
+        optionsMenu = new JMenu("Options");
+        optionsMenu.setMnemonic(KeyEvent.VK_O);
+        menuBar.add(optionsMenu);
+
+        // Build the menu items
+        lightMode = new JMenuItem("Light Mode");
+        lightMode.setMnemonic(KeyEvent.VK_L);
+        lightMode.addActionListener(e -> {
+            setLightMode();
+        });
+        lightMode.setEnabled(false);
+
+        darkMode = new JMenuItem("Dark Mode");
+        darkMode.setMnemonic(KeyEvent.VK_D);
+        darkMode.addActionListener(e -> {
+            setDarkMode();
+        });
+
+        // Add items to menu
+        optionsMenu.add(lightMode);
+        optionsMenu.add(darkMode);
     }
 
     private void createHelpMenu() {
@@ -329,9 +364,20 @@ public class UserInterface {
     // Show the popup displaying the 5 best completion times
     private void showBestTimes() {
 
-        JOptionPane.showMessageDialog(f, bt.getFormattedTimeList(), "Best Times", JOptionPane.INFORMATION_MESSAGE);
+        // Do some darkmode checking
+        if (darkmode) {
+            UIManager.put("OptionPane.background", Color.BLACK);
+            UIManager.put("Panel.background", Color.BLACK);
+            UIManager.put("OptionPane.messageForeground", Color.WHITE);
+            UIManager.put("Button.background", Color.WHITE);
+        } else {
+            UIManager.put("OptionPane.background", Color.WHITE);
+            UIManager.put("Panel.background", Color.WHITE);
+            UIManager.put("OptionPane.messageForeground", Color.BLACK);
+            UIManager.put("Button.background", Color.LIGHT_GRAY);
+        }
 
-        System.out.println("displaying best times.");
+        JOptionPane.showMessageDialog(f, bt.getFormattedTimeList(), "Best Times", JOptionPane.INFORMATION_MESSAGE);
     }
 
     // Quit the game
@@ -340,14 +386,113 @@ public class UserInterface {
         tt.tStop();
     }
 
+    // Set the GUI to be in light mode
+    private void setLightMode() {
+
+        // Set toggles accordingly
+        darkmode = false;
+        lightMode.setEnabled(false);
+        darkMode.setEnabled(true);
+
+        // Set main background and menubar
+        f.getContentPane().setBackground(Color.WHITE);
+        menuBar.setBackground(Color.WHITE);
+        mainMenu.setForeground(Color.BLACK);
+        currentGame.setForeground(Color.BLACK);
+        optionsMenu.setForeground(Color.BLACK);
+        helpMenu.setForeground(Color.BLACK);
+
+        // Get all the menu items and change background/foreground for light mode
+        for (int i = 0; i < menuBar.getMenuCount(); i++) {
+            JMenu menu1 = menuBar.getMenu(i);
+
+            for (int j = 0; j < menu1.getMenuComponentCount(); j++) {
+                java.awt.Component comp = menu1.getMenuComponent(j);
+                if (comp instanceof JMenuItem) {
+                    comp.setBackground(Color.WHITE);
+                    comp.setForeground(Color.BLACK);
+                }
+            }
+        }
+
+        // Get all the buttons and change them to be light mode
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                ng.getButton(j, i).setBackground(Color.LIGHT_GRAY);
+                ng.getButton(j, i).setForeground(Color.BLACK);
+
+                ng.getButton(j, i).setUI(new MetalButtonUI() {
+                    protected Color getDisabledTextColor() {
+                        return Color.GRAY;
+                    }
+                });
+            }
+        }
+    }
+
+    // Set the GUI to be in dark mode
+    private void setDarkMode() {
+
+        // Set toggles accordingly
+        darkmode = true;
+        lightMode.setEnabled(true);
+        darkMode.setEnabled(false);
+
+        // Set main background and menubar
+        f.getContentPane().setBackground(Color.BLACK);
+        menuBar.setBackground(Color.BLACK);
+        mainMenu.setForeground(Color.WHITE);
+        currentGame.setForeground(Color.WHITE);
+        optionsMenu.setForeground(Color.WHITE);
+        helpMenu.setForeground(Color.WHITE);
+
+        // Get all the menu items and change background/foreground for light mode
+        for (int i = 0; i < menuBar.getMenuCount(); i++) {
+            JMenu menu1 = menuBar.getMenu(i);
+
+            for (int j = 0; j < menu1.getMenuComponentCount(); j++) {
+                java.awt.Component comp = menu1.getMenuComponent(j);
+                if (comp instanceof JMenuItem) {
+                    comp.setBackground(Color.BLACK);
+                    comp.setForeground(Color.WHITE);
+                }
+            }
+        }
+
+        // Get all the buttons and change them to be light mode
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                ng.getButton(j, i).setBackground(Color.DARK_GRAY);
+                ng.getButton(j, i).setForeground(Color.WHITE);
+
+                ng.getButton(j, i).setUI(new MetalButtonUI() {
+                    protected Color getDisabledTextColor() {
+                        return Color.GRAY;
+                    }
+                });
+            }
+        }
+    }
+
     // Show the popup displaying the instructions
     private void displayInstructions() {
 
         final String gameInstructions = "Sudoku rules for beginners:\n- Only use the numbers 1 to 9\n- Avoid trying to guess the solution to the puzzle\n- Only use each number once in each row, column, & grid\n- Use the process of elimination as a tactic";
 
-        JOptionPane.showMessageDialog(f, gameInstructions, "Instructions", JOptionPane.INFORMATION_MESSAGE);
+        // Do some darkmode checking
+        if (darkmode) {
+            UIManager.put("OptionPane.background", Color.BLACK);
+            UIManager.put("Panel.background", Color.BLACK);
+            UIManager.put("OptionPane.messageForeground", Color.WHITE);
+            UIManager.put("Button.background", Color.WHITE);
+        } else {
+            UIManager.put("OptionPane.background", Color.WHITE);
+            UIManager.put("Panel.background", Color.WHITE);
+            UIManager.put("OptionPane.messageForeground", Color.BLACK);
+            UIManager.put("Button.background", Color.LIGHT_GRAY);
+        }
 
-        System.out.println("displaying the instructions.");
+        JOptionPane.showMessageDialog(f, gameInstructions, "Instructions", JOptionPane.INFORMATION_MESSAGE);
     }
 
     // Reset all buttons to be enabled again
@@ -382,6 +527,19 @@ public class UserInterface {
     // Check if the user solved the puzzle
     private void checkGameWin() {
 
+        // Do some darkmode checking
+        if (darkmode) {
+            UIManager.put("OptionPane.background", Color.BLACK);
+            UIManager.put("Panel.background", Color.BLACK);
+            UIManager.put("OptionPane.messageForeground", Color.WHITE);
+            UIManager.put("Button.background", Color.WHITE);
+        } else {
+            UIManager.put("OptionPane.background", Color.WHITE);
+            UIManager.put("Panel.background", Color.WHITE);
+            UIManager.put("OptionPane.messageForeground", Color.BLACK);
+            UIManager.put("Button.background", Color.LIGHT_GRAY);
+        }
+
         int numMatches = 0;
 
         // Iterate through the grid to check the values
@@ -390,7 +548,7 @@ public class UserInterface {
 
                 // Check the buttons against the master grid
                 if (ng.getButtonVal(j, i) == g.getGridValue(j, i)) {
-                    System.out.println("Value matches for " + i + "," + j + "!");
+                    // System.out.println("Value matches for " + i + "," + j + "!");
                     numMatches++;
                 } else {
                     System.out.println("Value does not match for " + i + "," + j + "!");
@@ -412,68 +570,5 @@ public class UserInterface {
             System.out.println("Not a winner yet...");
             JOptionPane.showMessageDialog(f, "Not a winner yet...", "Keep going!", JOptionPane.ERROR_MESSAGE);
         }
-    }
-}
-
-// Creating the abstract class here to fulfill the core requirement. I wanted to not use an 
-// abstract class here and just extend Thread from ThreadedTimer. But I really saw
-// no other better place for me to try to use an abstract class.
-abstract class Timer extends Thread {
-
-    public void reset() {
-    }
-
-    private void updateLabel() {
-    }
-}
-
-// Had to put the threads in this class file because I was not able to access data on the GUI
-// if it was in a different file. I tried for hours to get around this and found no success.
-// I don't want to do it this way, but it was the only thing that worked. I'm open to suggestions
-// on how to do this better.
-class ThreadedTimer extends Timer {
-
-    private int timeElapsedSec;
-    private boolean alive = true;
-
-    public ThreadedTimer() {
-
-        timeElapsedSec = 0;
-    }
-
-    @Override
-    public void run() {
-
-        System.out.println("thread started.");
-
-        while (alive) {
-            try {
-                Thread.sleep(1000);
-                timeElapsedSec++;
-                // System.out.println("Elapsed Time: " + timeElapsedSec + "s");
-                updateLabel();
-            } catch (InterruptedException ie) {
-                System.out.println("Thread was interrupted: " + ie);
-            }
-        }
-
-    }
-
-    public void reset() {
-        timeElapsedSec = 0;
-    }
-
-    public void tStop() {
-        alive = false;
-    }
-
-    public int getTime() {
-        return timeElapsedSec;
-    }
-
-    private void updateLabel() {
-
-        // This is the part that prevented me from putting the timers in a separate class file
-        UserInterface.setTimeElapsed("Elapsed Time: " + timeElapsedSec + "s");
     }
 }
