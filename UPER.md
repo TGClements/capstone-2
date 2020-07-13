@@ -24,10 +24,29 @@
     3. Executing the Plan
 </h2>
 
-\* \* \* \* \* \* \* \*
+- Started to build the UI.
+  - Built the window.
+  - Built the main menu.
+  - Built the button grid.
+  - Added functionality to click the button and change its value.
+  - Added the different game difficulties so I could wire them up later.
+  - Built the "quit" option.
+  - Built the "instructions" option.
+- Built first revision of algorithm to generate a valid and completed sudoku puzzle.
+- Created "Current Game" menu and menu items.
+  - Completed the "Lock in Correct Cells" functionality to check for correct cells before checking for win.
+  - Completed the "Check Win" option to allow players to actually win the game.
+- Wired up the different game difficulties. (The game is harder the less numbers are shown.)
+- Refactored some of the game algorithm to include lambdas and interfaces (including here instead of section 4, because this is for core req's.).
+- Created a timer by utilizing abstract classes.
+- Created a "Best Times" tracker that utilizes streams.
+- Created the ability to change the UI to be either "light mode" or "dark mode".
 
 <h2>
     4. Reflection / Refactor
 </h2>
 
-\* \* \* \* \* \* \* \*
+- Did some refactoring while I was developing to fulfill the core requirements
+  - Refactored the puzzle generation algorithm to utilize lambdas and interfaces.
+  - Refactored my Thread-based timer a few times to be able to access some of the fields and data from the UI class.
+- By refactoring while I was developing, and by "getting it working normally first", I felt like I actually saved some time and avoided potential bugs than if I were to try to refactor it later.

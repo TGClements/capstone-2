@@ -14,7 +14,7 @@ public class UserInterface {
     private JMenu mainMenu, currentGame, optionsMenu, helpMenu;
     private JMenuItem newEGame, newMGame, newHGame, newXGame, instructions, about, quit, lockInCorrect, checkWin,
             bestTimes, lightMode, darkMode;
-    private boolean darkmode;
+    public static boolean darkmode;
 
     public static JMenuItem timeElapsed;
 
@@ -332,11 +332,14 @@ public class UserInterface {
                 }
             }
 
+            // If the requested button is not already queued to be shown, queue it up
             try {
                 if (!valAlreadyExists) {
                     visibleButtons[i] = newVal;
                 }
-            } catch (ArrayIndexOutOfBoundsException aioobe) {
+            }
+            // Fires off if requested button is already queued
+            catch (ArrayIndexOutOfBoundsException aioobe) {
                 System.out.println("Taking a while to select which buttons to show: " + aioobe);
             }
 
@@ -483,7 +486,7 @@ public class UserInterface {
     // Show the popup displaying the instructions
     private void displayInstructions() {
 
-        final String gameInstructions = "Sudoku rules for beginners:\n- Only use the numbers 1 to 9\n- Avoid trying to guess the solution to the puzzle\n- Only use each number once in each row, column, & grid\n- Use the process of elimination as a tactic";
+        final String gameInstructions = "Sudoku rules for beginners:\n- Only use the numbers 1 to 9\n- Only use each number once in each row, column, & 3x3 grid\n- Use the process of elimination as a tactic\n- Avoid trying to guess the solution to the puzzle";
 
         // Do some darkmode checking
         if (darkmode) {
@@ -501,6 +504,7 @@ public class UserInterface {
         JOptionPane.showMessageDialog(f, gameInstructions, "Instructions", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    // Show the popup displaying the About section
     private void displayAbout() {
         // Do some darkmode checking
         if (darkmode) {

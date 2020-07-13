@@ -1,7 +1,5 @@
 package sudoku;
 
-import javax.swing.*;
-
 // Creating the abstract class here to fulfill the core requirement. I wanted to not use an 
 // abstract class here and just extend Thread from ThreadedTimer. But I really saw
 // no other better place for me to try to use an abstract class.
@@ -27,7 +25,7 @@ class ThreadedTimer extends Timer {
     @Override
     public void run() {
 
-        System.out.println("thread started.");
+        System.out.println("Timer started.");
 
         while (alive) {
             try {

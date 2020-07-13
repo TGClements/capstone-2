@@ -42,8 +42,6 @@ public class BestTimes {
 
         // Sort the list
         Collections.sort(timeList);
-
-        //System.out.println(timeList);
     }
 
     public String getFormattedTimeList() {

@@ -1,6 +1,7 @@
 package sudoku;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class NumberGrid extends UserInterface {
     private JButton[][] buttonGrid;
@@ -28,6 +29,19 @@ public class NumberGrid extends UserInterface {
     // Set the onclick for a Button
     private void setOnClick(JButton numButton) {
 
+        // Do some darkmode checking
+        if (UserInterface.darkmode) {
+            UIManager.put("OptionPane.background", Color.BLACK);
+            UIManager.put("Panel.background", Color.BLACK);
+            UIManager.put("OptionPane.messageForeground", Color.WHITE);
+            UIManager.put("Button.background", Color.WHITE);
+        } else {
+            UIManager.put("OptionPane.background", Color.WHITE);
+            UIManager.put("Panel.background", Color.WHITE);
+            UIManager.put("OptionPane.messageForeground", Color.BLACK);
+            UIManager.put("Button.background", Color.LIGHT_GRAY);
+        }
+
         try {
             String userVal = "0";
 
@@ -38,7 +52,6 @@ public class NumberGrid extends UserInterface {
                     || Integer.parseInt(userVal) != 8 || Integer.parseInt(userVal) != 9) {
                 userVal = JOptionPane.showInputDialog(this.f,
                         "Enter a value from 1-9. To clear the cell, enter 0.\n\nText will be ignored.\nIncorrect values will prompt this message again.");
-                //System.out.println("User entered: " + userVal);
 
                 // If the user enters 1-9, set the text of the clicked button to what was entered
                 if (Integer.parseInt(userVal) == 1 || Integer.parseInt(userVal) == 2 || Integer.parseInt(userVal) == 3
