@@ -50,3 +50,4 @@
   - Refactored the puzzle generation algorithm to utilize lambdas and interfaces.
   - Refactored my Thread-based timer a few times to be able to access some of the fields and data from the UI class.
 - By refactoring while I was developing, and by "getting it working normally first", I felt like I actually saved some time and avoided potential bugs than if I were to try to refactor it later.
+- With more time, I'd like to try to reduce the size of my UserInterface class and pull things out into separate files and classes.
